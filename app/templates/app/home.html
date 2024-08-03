@@ -5,11 +5,15 @@
 
 {% block content %}
 <style>
+    body {
+        background: linear-gradient(to right, #a6c0fe, #f68084);
+    }
     .jumbotron-custom {
-        background: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+        background: linear-gradient(to right, #a6c0fe, #f68084);
         color: white;
         padding: 50px 30px;
-        border-radius: 10px;
+        border-radius: 80px;
+        margin-top: 100px;
     }
     .jumbotron-custom h1 {
         font-size: 3em;
@@ -29,10 +33,10 @@
     }
 </style>
 <div class="jumbotron jumbotron-custom text-center">
-    <h1 class="display-4">Welcome to Web Messenger</h1>
-    <p class="lead">Connect with your friends and family.</p>
+    <h1 class="display-4">Добро пожаловать Web Messenger</h1>
+    <p class="lead">Общайтесь с друзьями и семьей.</p>
     <hr class="my-4">
-    <p>If you already have an account, please log in. If not, feel free to register.</p>
+    <p>Если у вас уже есть учетная запись, пожалуйста, войдите в систему. Если нет, смело зарегистрируйтесь.</p>
     <a class="btn btn-custom-primary btn-lg text-white" href="{% url 'login' %}" role="button">Log In</a>
     <a class="btn btn-custom-secondary btn-lg text-white" href="{% url 'register' %}" role="button">Register</a>
 </div>

@@ -1,12 +1,12 @@
 # app/views.py
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.models import User
 from .models import Message, Contact
 from .forms import MessageForm
-from .models import Message, User
 
 def home(request):
     return render(request, 'app/home.html')
@@ -37,18 +37,6 @@ def user_logout(request):
     auth_logout(request)
     return redirect('login')
 
-
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from .models import Contact
-
-# app/views.py
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from .models import Contact
-
 @login_required
 def contact_list(request):
     contacts = Contact.objects.filter(user=request.user)
@@ -66,13 +54,6 @@ def contact_list(request):
         return redirect('contact_list')
 
     return render(request, 'app/contact_list.html', {'contacts': contacts, 'all_users': all_users})
-
-
-# app/views.py
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from .models import Message, Contact
 
 @login_required
 def message_list(request):
@@ -116,8 +97,15 @@ def send_message(request):
         form = MessageForm()
     return render(request, 'app/send_message.html', {'form': form})
 
-@login_required
-def switch_user(request):
-    # Логика для смены пользователя
-    return redirect('home')
 
+from django.contrib.auth import authenticate, login as auth_login
+
+def switch_user(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            auth_login(request, user)
+            return redirect('home')  # Перенаправление на главную страницу после входа
+    return render(request, 'app/switch_user.html')
