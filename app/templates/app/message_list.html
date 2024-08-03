@@ -27,10 +27,10 @@
             <h2>Contacts</h2>
             <div class="list-group">
                 {% for contact in contact_list %}
-                    <a href="{% url 'message_list' %}?contact_id={{ contact.id }}" class="list-group-item list-group-item-action {% if contact_user == contact %}active{% endif %}">
-                        <img src="https://via.placeholder.com/40" alt="Avatar" class="avatar">
-                        {{ contact.username }}
-                    </a>
+                <a href="{% url 'message_list' %}?contact_id={{ contact.id }}" class="list-group-item list-group-item-action {% if contact.id == selected_contact.id %}active{% endif %}">
+                    <span class="avatar" style="padding-left: 6px; padding-top: 3px;">🐣</span>
+                    {{ contact.username }}
+                </a>
                 {% empty %}
                     <p>No contacts available.</p>
                 {% endfor %}

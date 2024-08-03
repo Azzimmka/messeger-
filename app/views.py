@@ -120,3 +120,4 @@ def send_message(request):
 def switch_user(request):
     # Логика для смены пользователя
     return redirect('home')
+
