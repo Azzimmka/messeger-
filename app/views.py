@@ -37,23 +37,70 @@ def user_logout(request):
     auth_logout(request)
     return redirect('login')
 
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from .models import Contact
+
+# app/views.py
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from .models import Contact
+
 @login_required
 def contact_list(request):
     contacts = Contact.objects.filter(user=request.user)
-    return render(request, 'app/contact_list.html', {'contacts': contacts})
+    all_users = User.objects.exclude(id=request.user.id)  # Получаем всех пользователей, кроме текущего
+
+    if request.method == 'POST':
+        contact_user_id = request.POST.get('contact_user')
+        if contact_user_id:
+            try:
+                contact_user = User.objects.get(id=contact_user_id)
+                Contact.objects.get_or_create(user=request.user, contact_user=contact_user)
+            except User.DoesNotExist:
+                # Обработка ошибки при отсутствии пользователя
+                pass
+        return redirect('contact_list')
+
+    return render(request, 'app/contact_list.html', {'contacts': contacts, 'all_users': all_users})
+
+
+# app/views.py
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from .models import Message, Contact
 
 @login_required
 def message_list(request):
-    contacts = User.objects.exclude(id=request.user.id)  # Все пользователи, кроме текущего
-    selected_contact_id = request.GET.get('contact_id')
-    selected_contact = User.objects.filter(id=selected_contact_id).first() if selected_contact_id else None
-    messages = Message.objects.filter(sender=request.user, receiver=selected_contact) | \
-               Message.objects.filter(sender=selected_contact, receiver=request.user)
-    messages = messages.order_by('timestamp')
+    contact_id = request.GET.get('contact_id')
+    contact_user = None
+    messages_sent = []
+    messages_received = []
+
+    # Получение списка контактов пользователя
+    contacts = Contact.objects.filter(user=request.user)
+    contact_list = [contact.contact_user for contact in contacts]
+
+    if contact_id:
+        contact_user = get_object_or_404(User, id=contact_id)
+        messages_sent = Message.objects.filter(sender=request.user, receiver=contact_user)
+        messages_received = Message.objects.filter(sender=contact_user, receiver=request.user)
+
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        if content and contact_user:
+            Message.objects.create(sender=request.user, receiver=contact_user, content=content)
+            return redirect(f'{request.path}?contact_id={contact_id}')
+
     return render(request, 'app/message_list.html', {
-        'contacts': contacts,
-        'selected_contact': selected_contact,
-        'messages': messages
+        'messages_sent': messages_sent,
+        'messages_received': messages_received,
+        'contact_user': contact_user,
+        'contact_list': contact_list
     })
 
 @login_required
