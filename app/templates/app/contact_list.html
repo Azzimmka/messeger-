@@ -1,0 +1,15 @@
+<!-- app/templates/app/contact_list.html -->
+{% extends "app/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Contacts</h2>
+    <ul class="list-group">
+        {% for contact in contacts %}
+            <li class="list-group-item">
+                {{ contact.contact_user.username }}
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

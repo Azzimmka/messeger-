@@ -1,0 +1,53 @@
+<!-- app/templates/app/message_list.html -->
+{% extends "app/base.html" %}
+
+{% block content %}
+<style>
+    .message-timestamp {
+    display: block; /* Обеспечивает перенос строки */
+    margin-top: 5px; /* Отступ сверху */
+    font-size: 0.8em; /* Размер шрифта */
+    color: #ccc; /* Цвет текста */
+}
+
+</style>
+<div class="container mt-5">
+    <div class="row">
+        <!-- Список чатов -->
+        <div class="col-md-3">
+            <h2>Chats</h2>
+            <ul class="list-group">
+                {% for contact in contacts %}
+                    <a href="{% url 'message_list' %}?contact_id={{ contact.id }}" class="list-group-item list-group-item-action {% if contact.id == selected_contact.id %}active{% endif %}">
+                        {{ contact.username }}
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+        <!-- Чат с текущим собеседником -->
+        <div class="col-md-9">
+            <h2>Chat with {{ selected_contact.username }}</h2>
+            <div class="chat-messages">
+                {% for message in messages %}
+                    <div class="message {% if message.sender == user %}sent{% else %}received{% endif %}">
+                        <p>
+                            <strong>{{ message.sender.username }}:</strong> {{ message.content }}
+                            <span class="message-timestamp">{{ message.timestamp|date:"d M Y H:i" }}</span>
+                        </p>
+                    </div>
+                {% empty %}
+                    <p>No messages yet.</p>
+                {% endfor %}
+            </div>
+            <div class="chat-footer mt-3">
+                <form action="{% url 'send_message' %}" method="post" class="form-inline w-100">
+                    {% csrf_token %}
+                    <input type="hidden" name="receiver_id" value="{{ selected_contact.id }}">
+                    <input type="text" name="content" class="form-control flex-grow-1 mr-2" placeholder="Type a message..." required>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

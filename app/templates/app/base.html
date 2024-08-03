@@ -1,0 +1,182 @@
+<!-- messenger/templates/messenger/base.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Web Messenger{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #2b2e4a;
+            color: #f5f5f5;
+            font-family: 'Poppins', sans-serif;
+        }
+        .chat-container {
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 25%;
+            background-color: #1f1f38;
+            border-right: 1px solid #414361;
+            overflow-y: auto;
+        }
+        .chat-area {
+            width: 75%;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .chat-header, .chat-footer {
+            background-color: #1f1f38;
+            padding: 15px;
+            border-bottom: 1px solid #414361;
+        }
+        .chat-footer {
+            border-top: 1px solid #414361;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #2b2e4a;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 75%;
+            display: flex;
+            align-items: center;
+        }
+        .message.sent {
+            background-color: #6c5ce7;
+            align-self: flex-end;
+            color: #fff;
+            border-top-right-radius: 0;
+        }
+        .message.received {
+            background-color: #414361;
+            align-self: flex-start;
+            color: #fff;
+            border-top-left-radius: 0;
+        }
+        .message .avatar {
+            margin-right: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        .message.sent .avatar {
+            margin-left: 10px;
+            margin-right: 0;
+        }
+        .form-control {
+            background-color: #414361;
+            border: none;
+            color: #f5f5f5;
+        }
+        .form-control:focus {
+            background-color: #414361;
+            border: none;
+            color: #f5f5f5;
+        }
+        .btn-primary {
+            background-color: #6c5ce7;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #5a4dbd;
+        }
+        .list-group-item {
+            background-color: #1f1f38;
+            color: #f5f5f5;
+            border: none;
+            display: flex;
+            align-items: center;
+        }
+        .list-group-item:hover, .list-group-item.active {
+            background-color: #6c5ce7;
+            border: none;
+        }
+        .list-group-item .avatar {
+            margin-right: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        .chat-header .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .chat-header .user-info .avatar {
+            margin-right: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="{% url 'home' %}">Web Messenger</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'contact_list' %}">Contacts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'message_list' %}">Messages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'send_message' %}">Send Message</a>
+                    </li>
+                    <li class="nav-item">
+                        <form action="{% url 'logout' %}" method="post" class="form-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link">Logout</button>
+                        </form>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'switch_user' %}">Switch User</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="action-icons">
+            <a class="btn btn-outline-light" href="{% url 'register' %}"><i class="fas fa-user-plus"></i></a>
+            <a class="btn btn-outline-light" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i></a>
+            <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button class="btn btn-outline-light" type="submit"><i class="fas fa-sign-out-alt"></i></button>
+            </form>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

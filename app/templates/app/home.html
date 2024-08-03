@@ -1,0 +1,15 @@
+<!-- messenger/templates/messenger/home.html -->
+{% extends "app/base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="jumbotron text-center">
+    <h1 class="display-4">Welcome to Web Messenger</h1>
+    <p class="lead">Connect with your friends and family.</p>
+    <hr class="my-4">
+    <p>If you already have an account, please log in. If not, feel free to register.</p>
+    <a class="btn btn-primary btn-lg" href="{% url 'login' %}" role="button">Log In</a>
+    <a class="btn btn-secondary btn-lg" href="{% url 'register' %}" role="button">Register</a>
+</div>
+{% endblock %}
